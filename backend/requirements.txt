@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-multipart
+qdrant-client
+redis
+rq
+PyPDF2
+python-docx
+sentence_transformers
+groq
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart

@@ -1,0 +1,49 @@
+.document-list h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.loading,
+.error,
+.no-documents {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.error {
+    color: #d32f2f;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+thead {
+    background: #f8f9fa;
+}
+
+th {
+    padding: 1 rem;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.processed {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.pending {
+    color: #ffc107;
+    font-weight: 600;
+}

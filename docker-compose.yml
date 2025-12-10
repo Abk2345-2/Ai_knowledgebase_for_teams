@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: knowledgebase
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: knowledgebase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U knowledgebase" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://knowledgebase:password123@db:5432/knowledgebase
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.worker
+    environment:
+      DATABASE_URL: postgresql://knowledgebase:password123@db:5432/knowledgebase
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+    depends_on:
+      - db
+      - redis
+      - qdrant
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_BACKEND_URL: http://localhost:8000
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  redis_data:
